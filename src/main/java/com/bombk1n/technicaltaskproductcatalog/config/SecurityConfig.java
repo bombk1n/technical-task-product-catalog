@@ -1,9 +1,6 @@
 package com.bombk1n.technicaltaskproductcatalog.config;
 
-import com.bombk1n.technicaltaskproductcatalog.security.CustomAccessDeniedHandler;
-import com.bombk1n.technicaltaskproductcatalog.security.CustomAuthenticationEntryPoint;
-import com.bombk1n.technicaltaskproductcatalog.security.JwtAuthenticationFilter;
-import com.bombk1n.technicaltaskproductcatalog.security.UserDetailsServiceImp;
+import com.bombk1n.technicaltaskproductcatalog.security.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +26,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final RateLimitFilter rateLimitFilter;
 
     private static final String[] ADMIN_WHITELIST = {
             "/swagger-ui/**",
@@ -52,6 +50,7 @@ public class SecurityConfig {
                         .accessDeniedHandler((accessDeniedHandler)))
                 .userDetailsService(userDetailsServiceImpl)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
 
